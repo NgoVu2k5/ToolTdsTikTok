@@ -1,0 +1,77 @@
+import webbrowser,time,pyautogui,requests,os
+
+#color
+
+black='\033[1;90m'
+pink='\033[1;97m'
+red='\033[1;91m'
+green='\033[1;92m'
+blue='\033[1;96m'
+yellow='\033[1;93m'
+pinkx='\033[7;37m\033[1;37m'
+pink='\033[1;95m'
+redb='\033[7;37m\033[1;91m'
+redz='\033[1;41;97m'
+end='\033[0m'
+
+#color
+
+TDS_token=input(pink+'NHẬP'+blue+' ACCESS_TOKEN TDS: '+pink)
+
+def open_nv(url,delay):
+    chrome_path="C:\Program Files\Google\Chrome\Application\chrome.exe"
+    webbrowser.register('chrome', None,webbrowser.BackgroundBrowser(chrome_path))
+    webbrowser.get('chrome').open_new_tab(url)
+    time.sleep(delay)
+    pyautogui.doubleClick()
+    time.sleep(7)
+    pyautogui.hotkey('ctrl','w')
+def open_nv_mobile(url,delay):
+    os.system(f"termux-open-url {url}")
+    time.sleep(delay)
+
+def login():
+    tt_acc=requests.get(f"https://traodoisub.com/api/?fields=profile&access_token={TDS_token}")
+    if "success" in tt_acc.text:
+        user=tt_acc.json()['data']['user']
+        xu=tt_acc.json()['data']['xu']
+        xu_die=tt_acc.json()['data']['xudie']
+        information=pink+'['+blue+'USER: '+pink+user.upper()+blue+']'+pink+' ['+yellow+xu+' XU'+pink+'] '+black+'['+xu_die+' XU DIE'+pink+']'
+        return information
+    else:
+        return pink+"["+blue+"ACCESS_TOKEN TDS LỖI"+pink+"] "+pink+"["+red+"VUI LÒNG THỬ LẠI!"+pink+"]"
+def lam_nv():
+    id_tiktok=input(blue+"NHẬP ID TIK TOK: "+pink)
+    cau_hinh=requests.get(f"https://traodoisub.com/api/?fields=tiktok_run&id={id_tiktok}&access_token={TDS_token}").json()
+    print(pink+"["+blue+cau_hinh['data']['msg']+pink+"] "+"["+blue+id_tiktok+pink+"]")
+    print(pink+"["+blue+"1"+pink+"] "+"["+blue+"LIKE TIKTOK"+pink+"]")
+    print(pink+"["+blue+"2"+pink+"] "+"["+blue+"FOLLOW TIKTOK"+pink+"]")
+    choice=input(blue+'NHẬP'+pink+' LỰA CHỌN: '+blue)
+    if choice=="1":
+        so_nv=int(input(blue+'NHẬP'+pink+' SỐ NHIỆM VỤ: '+blue))
+        delay=int(input(blue+'NHẬP '+pink+'DELAY: '+green))
+        while tbi!="1" and tbi!="2":
+            tbi=input(blue+'NHẬP '+pink+'THIẾT BỊ ([1]PC HOẶC [2]MOBILE): '+yellow)
+        dem=int()
+        while dem<=so_nv:
+            nv=requests.get(f"https://traodoisub.com/api/?fields=tiktok_like&access_token={TDS_token}")
+            if int(nv.json()['cache'])>=8:
+                nhan_xu=requests.get(f"https://traodoisub.com/api/coin/?type=TIKTOK_LIKE&id=TIKTOK_LIKE_API&access_token={TDS_token}").json()
+                print(pink+"["+blue+str(nhan_xu['data']['msg'])+pink+"] "+"[ XU: "+blue+str(nhan_xu['data']['xu'])+pink+"]")
+            for i in range(0,len(nv.json()['data'])):
+                if dem>so_nv: break
+                nvlike=nv.json()['data'][i]['link']
+                id_job=nv.json()['data'][i]['id']
+                print(pink+"["+blue+dem+pink+"] "+"["+blue+nvlike+pink+"]"+"["+blue+id_job+pink+"]")
+                if tbi=="1":
+                    open_nv(nvlike,delay)
+                else:
+                    open_nv_mobile(nvlike,delay)
+                duyet=requests.get(f"https://traodoisub.com/api/coin/?type=TIKTOK_LIKE_CACHE&id={id_job}&access_token={TDS_token}")
+                dem+=1
+if ("USER" in login())==True:
+    print(login())
+    lam_nv()
+else:
+    print(login())
+
